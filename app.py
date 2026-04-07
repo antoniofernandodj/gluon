@@ -210,6 +210,7 @@ Demonstrates:
 """
 
 from __future__ import annotations
+from typing import Callable
 
 from gluon import component, use_state, render, div, h1, h2, p, button, ul, li, span
 from gluon.http import get, HttpResponse
@@ -219,13 +220,16 @@ from js import document
 @component
 def UserList():
     users: list[dict[str, str]]
-    set_users = use_state([])
+    set_users: Callable[[list[dict[str, str]] | Callable[[list[dict[str, str]]], list[dict[str, str]]], None]]
+    users, set_users = use_state([])
 
     loading: bool
-    set_loading = use_state(False)
+    set_loading: Callable[[bool | Callable[[bool], bool]], None]
+    loading, set_loading = use_state(False)
 
     error: str
-    set_error = use_state("")
+    set_error: Callable[[str | Callable[[str], str]], None]
+    error, set_error = use_state("")
 
     async def fetch_users(e):
         set_loading(True)
