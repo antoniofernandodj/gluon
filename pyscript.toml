@@ -1,0 +1,21 @@
+# PyScript configuration for Gluon development
+# Run with any static file server from the project root, e.g.:
+#   python -m http.server 8000
+#   npx serve .
+#   VS Code Live Server
+
+# No PyPI packages needed for Phase 1
+packages = []
+
+# Mount all framework source files into Pyodide's virtual filesystem.
+# Paths on the left are virtual FS paths (importable by Python).
+# Values on the right are URLs fetched from the live server.
+[files]
+"gluon/__init__.py"          = "./gluon/__init__.py"
+"gluon/core/__init__.py"     = "./gluon/core/__init__.py"
+"gluon/core/vdom.py"         = "./gluon/core/vdom.py"
+"gluon/core/fiber.py"        = "./gluon/core/fiber.py"
+"gluon/core/scheduler.py"    = "./gluon/core/scheduler.py"
+"gluon/core/hooks.py"        = "./gluon/core/hooks.py"
+"gluon/core/component.py"    = "./gluon/core/component.py"
+"gluon/core/renderer.py"     = "./gluon/core/renderer.py"

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gluon</title>
+
+  <!--
+    Polyfill: crypto.randomUUID() requires a secure context (https / localhost).
+    When the dev server is accessed via IP (0.0.0.0 / 192.168.x.x), PyScript's
+    internals fail because randomUUID is undefined. This polyfill uses
+    crypto.getRandomValues, which IS available on non-secure origins.
+  -->
+  <script>
+    if (typeof crypto !== 'undefined' && !crypto.randomUUID) {
+      crypto.randomUUID = function () {
+        return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, c =>
+          (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+        );
+      };
+    }
+  </script>
+
+  <!--
+    PyScript CDN — no installation needed.
+    Check https://pyscript.net for the latest stable version URL.
+  -->
+  <script type="module" src="https://pyscript.net/releases/2024.11.1/core.js"></script>
+
+  <style>
+    /* Minimal reset so the app renders cleanly before styles load */
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; background: #f5f5f5; }
+
+    /* PyScript loading indicator */
+    #loading {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: system-ui, sans-serif;
+      font-size: 1.1rem;
+      color: #555;
+      background: #f5f5f5;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loading">Loading Python runtime…</div>
+  <div id="root"></div>
+
+  <!--
+    config="./pyscript.toml" tells PyScript to fetch the framework source
+    files from the live server and place them in Pyodide's virtual FS,
+    making `import gluon` work inside app.py.
+  -->
+  <script type="py" src="./app.py" config="./pyscript.toml"></script>
+
+  <script>
+    // Hide the loading overlay once PyScript fires its "ready" event.
+    // py:ready is dispatched on document when Pyodide finishes bootstrapping.
+    document.addEventListener('py:ready', () => {
+      const el = document.getElementById('loading');
+      if (el) el.remove();
+    });
+  </script>
+
+</body>
+</html>
