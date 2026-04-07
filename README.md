@@ -384,6 +384,7 @@ render(App, document.getElementById('root'))
 ```tree
 gluon/              Framework source (loaded by PyScript via pyscript.toml)
 ├── __init__.py     Public API
+├── http.py         HTTP client (get, post, put, patch, delete, head, HttpResponse)
 └── core/
     ├── vdom.py     VNode + all HTML element functions
     ├── fiber.py    Per-component state container (hooks storage)
@@ -399,6 +400,16 @@ stubs/              Type stubs for js and pyodide (editor support)
     ├── ffi.pyi
     └── http.pyi
 
+docs/               User-facing guides
+├── getting-started.md
+├── components.md
+├── state.md
+├── http.md
+└── elements.md
+
+examples/           Standalone runnable demos
+└── http_client.py  Fetch API demo
+
 app.py              Demo application
 index.html          HTML entry point
 pyscript.toml       PyScript config (declares which files to mount)
@@ -411,7 +422,7 @@ pyrightconfig.json  Pyright / Pylance configuration
 
 | Phase | Status | Feature |
 | ----- | ------ | ------- |
-| 1 | ✅ Done | `@component`, `use_state`, full element library, event handling |
+| 1 | ✅ Done | `@component`, `use_state`, full element library, event handling, HTTP client |
 | 2 | Planned | VDOM diffing & reconciliation (no more full-tree replacement) |
 | 3 | Planned | `use_effect`, `use_ref`, `use_memo`, `use_reducer`, `use_context` / `create_context` |
 | 4 | Planned | Client-side router — `HashRouter`, `Route`, `Link`, `use_navigate`, `use_params` |
