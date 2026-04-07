@@ -17,7 +17,7 @@ from typing import Callable
 from gluon import component, use_state, render
 from gluon import div, h1, h2, h3, p, button, span, ul, li, input, label, hr, strong
 from gluon.core.vdom import VNode
-from js import document, Event, MouseEvent, KeyboardEvent, InputEvent
+from js import document, Event, KeyboardEvent
 
 
 # ─── Type aliases for state setters ────────────────────────────────────────────
@@ -49,13 +49,13 @@ def Counter(title: str = 'Counter', initial: int = 0) -> VNode:
     set_count: IntSetter
     count, set_count = use_state(initial)
 
-    def decrement(e: MouseEvent) -> None:
+    def decrement(e: Event) -> None:
         set_count(lambda n: n - 1)
 
-    def increment(e: MouseEvent) -> None:
+    def increment(e: Event) -> None:
         set_count(lambda n: n + 1)
 
-    def reset(e: MouseEvent) -> None:
+    def reset(e: Event) -> None:
         set_count(initial)
 
     color: str = '#27ae60' if count > 0 else ('#e74c3c' if count < 0 else '#7f8c8d')
@@ -94,17 +94,17 @@ def TodoList() -> VNode:
     set_text: StrSetter
     text, set_text = use_state('')
 
-    def on_input(e: InputEvent) -> None:
+    def on_input(e: Event) -> None:
         set_text(e.target.value)
 
-    def add_todo(e: MouseEvent) -> None:
+    def add_todo(e: Event) -> None:
         t = text.strip()
         if t:
             set_todos(lambda lst: [*lst, t])
             set_text('')
 
-    def remove(idx: int) -> Callable[[MouseEvent], None]:
-        def handler(e: MouseEvent) -> None:
+    def remove(idx: int) -> Callable[[Event], None]:
+        def handler(e: Event) -> None:
             set_todos(lambda lst: [item for i, item in enumerate(lst) if i != idx])
         return handler
 
