@@ -10,15 +10,20 @@ Demonstrates:
   - list comprehension as children
 """
 
+from __future__ import annotations
+
+from typing import Any
+
 from gluon import component, use_state, render
 from gluon import div, h1, h2, h3, p, button, span, ul, li, input, label, hr, strong
+from gluon.core.vdom import VNode
 from js import document
 
 
 # ─── Reusable components ───────────────────────────────────────────────────────
 
 @component
-def Badge(text, color='#0077ff'):
+def Badge(text: str, color: str = '#0077ff') -> VNode:
     return span(
         text,
         style={
@@ -33,19 +38,21 @@ def Badge(text, color='#0077ff'):
 
 
 @component
-def Counter(title='Counter', initial=0):
+def Counter(title: str = 'Counter', initial: int = 0) -> VNode:
+    count: int
+    set_count: Any
     count, set_count = use_state(initial)
 
-    def decrement(e):
+    def decrement(e: Any) -> None:
         set_count(lambda n: n - 1)
 
-    def increment(e):
+    def increment(e: Any) -> None:
         set_count(lambda n: n + 1)
 
-    def reset(e):
+    def reset(e: Any) -> None:
         set_count(initial)
 
-    color = '#27ae60' if count > 0 else ('#e74c3c' if count < 0 else '#7f8c8d')
+    color: str = '#27ae60' if count > 0 else ('#e74c3c' if count < 0 else '#7f8c8d')
 
     return div(
         h3(title),
@@ -72,25 +79,30 @@ def Counter(title='Counter', initial=0):
 
 
 @component
-def TodoList():
+def TodoList() -> VNode:
+    todos: list[str]
+    set_todos: Any
     todos, set_todos = use_state(['Buy groceries', 'Write some Python'])
+    
+    text: str
+    set_text: Any
     text, set_text = use_state('')
 
-    def on_input(e):
+    def on_input(e: Any) -> None:
         set_text(e.target.value)
 
-    def add_todo(e):
+    def add_todo(e: Any) -> None:
         t = text.strip()
         if t:
             set_todos(lambda lst: [*lst, t])
             set_text('')
 
-    def remove(idx):
-        def handler(e):
+    def remove(idx: int):
+        def handler(e: Any) -> None:
             set_todos(lambda lst: [item for i, item in enumerate(lst) if i != idx])
         return handler
 
-    def on_keydown(e):
+    def on_keydown(e: Any) -> None:
         if e.key == 'Enter':
             add_todo(e)
 
@@ -138,7 +150,7 @@ def TodoList():
 # ─── Root app ──────────────────────────────────────────────────────────────────
 
 @component
-def App():
+def App() -> VNode:
     return div(
         h1('🧪 Gluon', style={'margin-bottom': '4px'}),
         p(
