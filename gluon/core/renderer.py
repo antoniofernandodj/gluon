@@ -333,13 +333,56 @@ def _root_rerender():
     _do_render()
 
 
+def _focus_selector(container, active) -> str | None:
+    """
+    Build a CSS selector (relative to *container*) that uniquely identifies
+    *active* by its position in the DOM tree using :nth-of-type().
+
+    Example result: "div:nth-of-type(1) > form:nth-of-type(1) > input:nth-of-type(2)"
+    """
+    parts = []
+    el = active
+    while el and el != container:
+        parent = el.parentElement
+        if parent is None:
+            return None
+        tag = el.tagName.lower()
+        # Count same-tag siblings that appear before this element (1-based)
+        idx = 1
+        sib = el.previousElementSibling
+        while sib:
+            if sib.tagName.lower() == tag:
+                idx += 1
+            sib = sib.previousElementSibling
+        parts.append(f'{tag}:nth-of-type({idx})')
+        el = parent
+    if not parts:
+        return None
+    parts.reverse()
+    return ' > '.join(parts)
+
+
 def _do_render():
     global _active_proxies
 
     if _root_fiber is None or _root_container is None:
         return
 
-    # Destroy old JS proxies to avoid memory leaks
+    # ── Save focus state before destroying the DOM ────────────────────────────
+    selector = None
+    sel_start = None
+    sel_end = None
+    active = document.activeElement
+    if active and active != document.body and active != document.documentElement:
+        selector = _focus_selector(_root_container, active)
+        if selector:
+            try:
+                sel_start = active.selectionStart
+                sel_end   = active.selectionEnd
+            except Exception:
+                pass  # not a text-like input
+
+    # ── Destroy old JS proxies to avoid memory leaks ──────────────────────────
     for proxy in _active_proxies:
         try:
             proxy.destroy()
@@ -348,7 +391,7 @@ def _do_render():
 
     proxies: list = []
 
-    # Render root component with its fiber as context
+    # ── Render root component with its fiber as context ───────────────────────
     prev = _ctx._current_fiber
     _ctx._current_fiber = _root_fiber
     _root_fiber.hook_index = 0
@@ -359,9 +402,20 @@ def _do_render():
 
     dom_node = create_dom(vnode, proxies)
 
-    # Replace container content atomically
+    # ── Replace container content atomically ──────────────────────────────────
     _root_container.innerHTML = ''
     if dom_node is not None:
         _root_container.appendChild(dom_node)
 
     _active_proxies = proxies
+
+    # ── Restore focus and cursor position ─────────────────────────────────────
+    if selector:
+        try:
+            target = _root_container.querySelector(selector)
+            if target:
+                target.focus()
+                if sel_start is not None:
+                    target.setSelectionRange(sel_start, sel_end)
+        except Exception:
+            pass
