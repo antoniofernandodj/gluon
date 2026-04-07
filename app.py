@@ -20,6 +20,12 @@ from gluon.core.vdom import VNode
 from js import document, Event, MouseEvent, KeyboardEvent, InputEvent
 
 
+# ─── Type aliases for state setters ────────────────────────────────────────────
+IntSetter = Callable[[int | Callable[[int], int]], None]
+ListSetter = Callable[[list[str] | Callable[[list[str]], list[str]]], None]
+StrSetter = Callable[[str | Callable[[str], str]], None]
+
+
 # ─── Reusable components ───────────────────────────────────────────────────────
 
 @component
@@ -39,9 +45,6 @@ def Badge(text: str, color: str = '#0077ff') -> VNode:
 
 @component
 def Counter(title: str = 'Counter', initial: int = 0) -> VNode:
-    # Type aliases for state setters
-    IntSetter = Callable[[int | Callable[[int], int]], None]
-    
     count: int
     set_count: IntSetter
     count, set_count = use_state(initial)
@@ -83,10 +86,6 @@ def Counter(title: str = 'Counter', initial: int = 0) -> VNode:
 
 @component
 def TodoList() -> VNode:
-    # Type aliases for state setters
-    ListSetter = Callable[[list[str] | Callable[[list[str]], list[str]]], None]
-    StrSetter = Callable[[str | Callable[[str], str]], None]
-    
     todos: list[str]
     set_todos: ListSetter
     todos, set_todos = use_state(['Buy groceries', 'Write some Python'])
