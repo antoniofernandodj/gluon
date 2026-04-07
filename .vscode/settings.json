@@ -1,0 +1,12 @@
+{
+  "python.analysis.stubPath": "stubs",
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.reportMissingImports": "warning",
+  "python.analysis.reportMissingModuleSource": "none",
+  "python.analysis.reportUnknownMemberType": "none",
+  "python.analysis.reportUnknownVariableType": "none",
+  "python.analysis.reportUnknownArgumentType": "none",
+  "python.analysis.extraPaths": [
+    "."
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "stubPath": "stubs",
+  "pythonVersion": "3.12",
+  "typeCheckingMode": "basic",
+  "reportMissingImports": "warning",
+  "reportMissingModuleSource": "none",
+  "reportUnknownMemberType": "none",
+  "reportUnknownVariableType": "none",
+  "reportUnknownArgumentType": "none",
+  "exclude": [
+    "**/__pycache__",
+    "**/node_modules"
+  ]
+}
