@@ -48,7 +48,7 @@ The first load takes a few seconds while PyScript downloads the Pyodide WASM run
 
 ## How it works
 
-```
+```tree
 index.html
   └─ loads PyScript (CDN script tag)
         └─ PyScript fetches gluon/*.py from the live server
@@ -226,7 +226,7 @@ form(onSubmit=lambda e: (e.preventDefault(), handle()))
 ```
 
 | Prop | DOM event |
-|------|-----------|
+| ---- | --------- |
 | `onClick` / `onclick` | `click` |
 | `onChange` / `onchange` | `change` |
 | `onInput` / `oninput` | `input` |
@@ -246,7 +246,7 @@ input(type='checkbox', checked=True, disabled=False)
 ### Special aliases
 
 | Prop | HTML attribute |
-|------|----------------|
+| ---- | -------------- |
 | `class_` / `className` | `class` |
 | `for_` / `htmlFor` | `for` |
 | `tabIndex` | `tabindex` |
@@ -294,7 +294,7 @@ render(App, document.getElementById('root'))
 
 ## Project layout
 
-```
+```tree
 gluon/              Framework source (loaded by PyScript via pyscript.toml)
 ├── __init__.py     Public API
 └── core/
@@ -323,7 +323,7 @@ pyrightconfig.json  Pyright / Pylance configuration
 ## Roadmap
 
 | Phase | Status | Feature |
-|-------|--------|---------|
+| ----- | ------ | ------- |
 | 1 | ✅ Done | `@component`, `use_state`, full element library, event handling |
 | 2 | Planned | VDOM diffing & reconciliation (no more full-tree replacement) |
 | 3 | Planned | `use_effect`, `use_ref`, `use_memo`, `use_reducer`, `use_context` / `create_context` |

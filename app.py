@@ -57,7 +57,7 @@ def Counter(title: str = 'Counter', initial: int = 0) -> VNode:
     return div(
         h3(title),
         div(
-            button('−', onClick=decrement, style={'font-size': '1.2rem', 'padding': '4px 12px'}),
+            button('-', onClick=decrement, style={'font-size': '1.2rem', 'padding': '4px 12px'}),
             span(
                 str(count),
                 style={'font-size': '1.5rem', 'font-weight': 'bold', 'color': color,
