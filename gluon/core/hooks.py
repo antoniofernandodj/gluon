@@ -12,10 +12,10 @@ from typing import Callable, TypeVar
 import gluon.core.fiber as _ctx
 from gluon.core.scheduler import schedule_rerender
 
-T = TypeVar('T')
+# T = TypeVar('T')
 
 
-def use_state(initial: T | Callable[[], T]) -> tuple[T, Callable[[T | Callable[[T], T]], None]]:
+def use_state[T](initial: T | Callable[[], T]) -> tuple[T, Callable[[T | Callable[[T], T]], None]]:
     """
     Declare a piece of local state inside a functional component.
 

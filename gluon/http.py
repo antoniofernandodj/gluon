@@ -50,7 +50,9 @@ class HttpResponse:
 
     async def json(self) -> Any:
         """Parse and return the response body as JSON."""
-        return await self._js_response.json()
+        import json
+        text = await self.text()
+        return json.loads(text)
 
     async def blob(self) -> Any:
         """Return the response body as a JS Blob (useful for images, files, etc.)."""
