@@ -2,14 +2,13 @@
 Type stubs for `pyodide.ffi` — Foreign Function Interface between Python and JS.
 
 Key functions used in Gluon:
-  create_proxy  – wraps a Python callable so JS can call it (and keeps it alive)
-  to_js         – converts a Python object to its JS equivalent
+  create_proxy  - wraps a Python callable so JS can call it (and keeps it alive)
+  to_js         - converts a Python object to its JS equivalent
 """
 
 from typing import Any, Callable, Generic, TypeVar, overload
 
 _T = TypeVar("_T")
-_F = TypeVar("_F", bound=Callable[..., Any])
 
 # ── JsProxy ────────────────────────────────────────────────────────────────────
 
@@ -40,7 +39,7 @@ class JsProxy:
 # ── Core FFI functions ─────────────────────────────────────────────────────────
 
 def create_proxy(
-    obj: _F,
+    obj: Callable[..., Any],
     /,
     *,
     capture_this: bool = ...,
@@ -59,7 +58,7 @@ def create_proxy(
     """
     ...
 
-def create_once_callable(obj: _F, /) -> JsProxy:
+def create_once_callable(obj: Callable[..., Any], /) -> JsProxy:
     """
     Like `create_proxy`, but the proxy destroys itself after the first call.
     """
