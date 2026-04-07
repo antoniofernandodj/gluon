@@ -27,7 +27,7 @@ Prop normalisation
 from __future__ import annotations
 
 import inspect
-from typing import Any, Callable
+from typing import Any, Callable, cast
 
 from js import document
 from pyodide.ffi import create_proxy
@@ -229,15 +229,17 @@ def _expand_component(vnode: VNode, proxies: list[Any]) -> Any:
         return create_dom(result, proxies)
 
     # ── Functional component ──────────────────────────────────────────────
-    if tag not in _fiber_registry:
-        _fiber_registry[tag] = Fiber(tag)
-    fiber = _fiber_registry[tag]
+    # At this point, tag is guaranteed to be a callable function component
+    fn = cast(Callable[..., Any], tag)
+    if fn not in _fiber_registry:
+        _fiber_registry[fn] = Fiber(fn)
+    fiber = _fiber_registry[fn]
 
     prev = _ctx._current_fiber
     _ctx._current_fiber = fiber
     fiber.hook_index = 0
     try:
-        result = _call_fn(tag, props, children)
+        result = _call_fn(fn, props, children)
     finally:
         _ctx._current_fiber = prev
 
