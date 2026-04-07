@@ -124,6 +124,93 @@ class Clock(Component):
 
 ---
 
+## HTTP client — `gluon.http`
+
+Gluon ships a built-in HTTP client backed by the browser's native `fetch` API.
+All functions are `async` — use them inside `async def` event handlers.
+
+```python
+from gluon import component, use_state, div, button, ul, li, p
+from gluon.http import get
+
+@component
+def UserList():
+    users,   set_users   = use_state([])
+    loading, set_loading = use_state(False)
+    error,   set_error   = use_state("")
+
+    async def fetch_users(e):
+        set_loading(True)
+        set_error("")
+        try:
+            resp = await get("https://jsonplaceholder.typicode.com/users?_limit=5")
+            if resp.ok:
+                set_users(await resp.json())
+            else:
+                set_error(f"{resp.status} {resp.status_text}")
+        except Exception as exc:
+            set_error(str(exc))
+        finally:
+            set_loading(False)
+
+    return div(
+        button("Fetch Users", onClick=fetch_users),
+        p("Loading…") if loading else None,
+        p(error, style={"color": "red"}) if error else None,
+        ul(*[li(user["name"]) for user in users]) if users else None,
+    )
+```
+
+### Functions
+
+| Function | Description |
+| -------- | ----------- |
+| `await get(url, **kw)` | GET request |
+| `await post(url, json=..., **kw)` | POST with JSON body |
+| `await put(url, **kw)` | PUT request |
+| `await patch(url, **kw)` | PATCH request |
+| `await delete(url, **kw)` | DELETE request |
+| `await head(url, **kw)` | HEAD request |
+| `await request(url, method, ...)` | Full control |
+
+### `HttpResponse`
+
+| Member | Type | Description |
+| ------ | ---- | ----------- |
+| `.ok` | `bool` | `True` if status 200–299 |
+| `.status` | `int` | HTTP status code |
+| `.status_text` | `str` | Status message |
+| `await .json()` | `Any` | Parse body as JSON → Python `dict` / `list` |
+| `await .text()` | `str` | Raw body as a string |
+| `await .blob()` | `JsProxy` | JS Blob (images, files) |
+| `await .array_buffer()` | `JsProxy` | JS ArrayBuffer (binary data) |
+
+### Sending JSON
+
+```python
+resp = await post(
+    "https://api.example.com/items",
+    json={"name": "widget", "qty": 3},
+)
+```
+
+`Content-Type: application/json` is set automatically when `json=` is used.
+
+### Custom headers
+
+```python
+resp = await get(
+    "https://api.example.com/protected",
+    headers={"Authorization": "Bearer my-token"},
+)
+```
+
+> All requests go through `window.fetch` and are subject to the same CORS rules
+> as regular browser requests. JSONPlaceholder and most public APIs have CORS
+> enabled; your own API must as well (or use a proxy).
+
+---
+
 ## State — `use_state`
 
 ```python
