@@ -25,6 +25,18 @@ from gluon.core.component import component, Component
 from gluon.core.hooks import use_state
 from gluon.core.renderer import render
 
+# ── HTTP client (browser native fetch) ────────────────────────────────────────
+from gluon.http import (
+    HttpResponse,
+    request,
+    get,
+    post,
+    put,
+    patch,
+    delete,
+    head,
+)
+
 # ── HTML elements ─────────────────────────────────────────────────────────────
 from gluon.core.vdom import (
     fragment,
@@ -54,6 +66,8 @@ from gluon.core.vdom import (
 __all__ = [
     # Core
     'component', 'Component', 'use_state', 'render', 'fragment',
+    # HTTP
+    'HttpResponse', 'request', 'get', 'post', 'put', 'patch', 'delete', 'head',
     # Block
     'div', 'p', 'section', 'article', 'aside', 'header', 'footer',
     'main', 'nav', 'ul', 'ol', 'li', 'dl', 'dt', 'dd',
