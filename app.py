@@ -12,12 +12,12 @@ Demonstrates:
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Callable
 
 from gluon import component, use_state, render
 from gluon import div, h1, h2, h3, p, button, span, ul, li, input, label, hr, strong
 from gluon.core.vdom import VNode
-from js import document
+from js import document, Event, MouseEvent, KeyboardEvent, InputEvent
 
 
 # ─── Reusable components ───────────────────────────────────────────────────────
@@ -39,17 +39,20 @@ def Badge(text: str, color: str = '#0077ff') -> VNode:
 
 @component
 def Counter(title: str = 'Counter', initial: int = 0) -> VNode:
+    # Type aliases for state setters
+    IntSetter = Callable[[int | Callable[[int], int]], None]
+    
     count: int
-    set_count: Any
+    set_count: IntSetter
     count, set_count = use_state(initial)
 
-    def decrement(e: Any) -> None:
+    def decrement(e: MouseEvent) -> None:
         set_count(lambda n: n - 1)
 
-    def increment(e: Any) -> None:
+    def increment(e: MouseEvent) -> None:
         set_count(lambda n: n + 1)
 
-    def reset(e: Any) -> None:
+    def reset(e: MouseEvent) -> None:
         set_count(initial)
 
     color: str = '#27ae60' if count > 0 else ('#e74c3c' if count < 0 else '#7f8c8d')
@@ -80,29 +83,33 @@ def Counter(title: str = 'Counter', initial: int = 0) -> VNode:
 
 @component
 def TodoList() -> VNode:
-    todos: list[str]
-    set_todos: Any
-    todos, set_todos = use_state(['Buy groceries', 'Write some Python'])
+    # Type aliases for state setters
+    ListSetter = Callable[[list[str] | Callable[[list[str]], list[str]]], None]
+    StrSetter = Callable[[str | Callable[[str], str]], None]
     
+    todos: list[str]
+    set_todos: ListSetter
+    todos, set_todos = use_state(['Buy groceries', 'Write some Python'])
+
     text: str
-    set_text: Any
+    set_text: StrSetter
     text, set_text = use_state('')
 
-    def on_input(e: Any) -> None:
+    def on_input(e: InputEvent) -> None:
         set_text(e.target.value)
 
-    def add_todo(e: Any) -> None:
+    def add_todo(e: MouseEvent) -> None:
         t = text.strip()
         if t:
             set_todos(lambda lst: [*lst, t])
             set_text('')
 
-    def remove(idx: int):
-        def handler(e: Any) -> None:
+    def remove(idx: int) -> Callable[[MouseEvent], None]:
+        def handler(e: MouseEvent) -> None:
             set_todos(lambda lst: [item for i, item in enumerate(lst) if i != idx])
         return handler
 
-    def on_keydown(e: Any) -> None:
+    def on_keydown(e: KeyboardEvent) -> None:
         if e.key == 'Enter':
             add_todo(e)
 
