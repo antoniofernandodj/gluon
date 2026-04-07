@@ -22,10 +22,14 @@ and implement render():
             return div(p('…'))
 """
 
+from __future__ import annotations
+
+from typing import Any, Callable
+
 from gluon.core.vdom import VNode, _flatten
 
 
-def component(fn):
+def component(fn: Callable[..., Any]) -> Callable[..., VNode]:
     """
     Decorator: mark *fn* as a Gluon functional component.
 
@@ -33,14 +37,14 @@ def component(fn):
     running the function immediately. The renderer will run *fn* at
     the right moment with the correct fiber context active.
     """
-    def _call(*children, **props):
+    def _call(*children: Any, **props: Any) -> VNode:
         key = props.pop('key', None)
         # children passed positionally end up in props['children']
         all_props = {**props, 'children': _flatten(children)}
         return VNode(fn, all_props, _flatten(children), key)
 
-    _call._is_component = True
-    _call._component_fn = fn        # renderer uses this to look up the fiber
+    _call._is_component = True  # type: ignore[attr-defined]
+    _call._component_fn = fn        # renderer uses this to look up the fiber  # type: ignore[attr-defined]
     _call.__name__ = fn.__name__
     _call.__qualname__ = fn.__qualname__
     _call.__doc__ = fn.__doc__
@@ -52,7 +56,7 @@ def component(fn):
 class ComponentMeta(type):
     """Metaclass that makes Component subclasses behave like @component wrappers."""
 
-    def __call__(cls, *children, **props):
+    def __call__(cls, *children: Any, **props: Any) -> VNode | Component:  # type: ignore[override]
         # When used as MyComponent(prop=…) in a tree → return VNode
         if _is_in_render_tree():
             key = props.pop('key', None)
@@ -63,7 +67,7 @@ class ComponentMeta(type):
         return super().__call__(*children, **props)
 
 
-def _is_in_render_tree():
+def _is_in_render_tree() -> bool:
     """True when called during a render pass (fiber context is active)."""
     import gluon.core.fiber as _ctx
     return _ctx._current_fiber is not None
@@ -88,8 +92,8 @@ class Component(metaclass=ComponentMeta):
     # Marks the class so the renderer can identify it
     _is_component = True
 
-    def __init__(self, **props):
-        self.props = props
+    def __init__(self, **props: Any) -> None:
+        self.props: dict[str, Any] = props
 
-    def render(self):
+    def render(self) -> Any:
         raise NotImplementedError("Component subclasses must implement render()")

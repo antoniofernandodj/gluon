@@ -24,7 +24,10 @@ Prop normalisation
 - bool attributes      → setAttribute(attr, '') / removeAttribute
 """
 
+from __future__ import annotations
+
 import inspect
+from typing import Any, Callable
 
 from js import document
 from pyodide.ffi import create_proxy
@@ -37,13 +40,13 @@ from gluon.core.component import Component
 
 # ─── Root state ────────────────────────────────────────────────────────────────
 _root_fiber: Fiber | None = None
-_root_container = None       # JS DOM element
+_root_container: Any = None       # JS DOM element
 
 # ─── Per-component fiber registry (Phase 1: one fiber per component fn) ───────
-_fiber_registry: dict = {}
+_fiber_registry: dict[Callable[..., Any], Fiber] = {}
 
 # ─── Live JS proxies (destroyed before each re-render) ────────────────────────
-_active_proxies: list = []
+_active_proxies: list[Any] = []
 
 
 # ─── Event name map ────────────────────────────────────────────────────────────
@@ -117,7 +120,7 @@ def _css_key(name: str) -> str:
 
 # ─── DOM creation ──────────────────────────────────────────────────────────────
 
-def create_dom(vnode, proxies: list):
+def create_dom(vnode: Any, proxies: list[Any]) -> Any:
     """Recursively convert a VNode tree to real DOM nodes."""
 
     if vnode is None or vnode is False:
@@ -171,7 +174,8 @@ def create_dom(vnode, proxies: list):
     return document.createTextNode(str(vnode))
 
 
-def _apply_props(el, props: dict, proxies: list) -> None:
+def _apply_props(el: Any, props: dict[str, Any], proxies: list[Any]) -> None:
+    """Apply props to a DOM element, handling events, styles, and attributes."""
     for key, val in props.items():
         if val is None:
             continue
@@ -210,7 +214,7 @@ def _apply_props(el, props: dict, proxies: list) -> None:
 
 # ─── Component expansion ───────────────────────────────────────────────────────
 
-def _expand_component(vnode: VNode, proxies: list):
+def _expand_component(vnode: VNode, proxies: list[Any]) -> Any:
     """Render a component VNode: set fiber context, call fn, recurse."""
     tag = vnode.type
     props = dict(vnode.props)
@@ -240,7 +244,7 @@ def _expand_component(vnode: VNode, proxies: list):
     return create_dom(result, proxies)
 
 
-def _call_fn(fn, props: dict, children: list):
+def _call_fn(fn: Callable[..., Any], props: dict[str, Any], children: list[Any]) -> Any:
     """
     Call *fn* passing only the parameters it actually declares.
 
@@ -278,7 +282,7 @@ def _call_fn(fn, props: dict, children: list):
 
     # def Comp(text, title, color='…')  →  named params filled from props first,
     # then from children in declaration order for any that are still missing.
-    kwargs: dict = {}
+    kwargs: dict[str, Any] = {}
     children_iter = iter(children)
 
     for name, param in params.items():
@@ -303,7 +307,7 @@ def _call_fn(fn, props: dict, children: list):
 
 # ─── Root render ───────────────────────────────────────────────────────────────
 
-def render(component_wrapper, container):
+def render(component_wrapper: Callable[..., Any] | type[Component], container: Any) -> None:
     """
     Mount a root component into a DOM container element.
 
@@ -328,12 +332,12 @@ def render(component_wrapper, container):
     _do_render()
 
 
-def _root_rerender():
+def _root_rerender() -> None:
     """Called by the scheduler after batching state updates."""
     _do_render()
 
 
-def _focus_selector(container, active) -> str | None:
+def _focus_selector(container: Any, active: Any) -> str | None:
     """
     Build a CSS selector (relative to *container*) that uniquely identifies
     *active* by its position in the DOM tree using :nth-of-type().
@@ -362,7 +366,8 @@ def _focus_selector(container, active) -> str | None:
     return ' > '.join(parts)
 
 
-def _do_render():
+def _do_render() -> None:
+    """Perform the actual render cycle: destroy old proxies, render vnode, replace DOM."""
     global _active_proxies
 
     if _root_fiber is None or _root_container is None:

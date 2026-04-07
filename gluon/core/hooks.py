@@ -5,11 +5,17 @@ Phase 1: use_state
 Phase 3 will add: use_effect, use_ref, use_memo, use_reducer, use_context
 """
 
+from __future__ import annotations
+
+from typing import Callable, TypeVar
+
 import gluon.core.fiber as _ctx
 from gluon.core.scheduler import schedule_rerender
 
+T = TypeVar('T')
 
-def use_state(initial):
+
+def use_state(initial: T | Callable[[], T]) -> tuple[T, Callable[[T | Callable[[T], T]], None]]:
     """
     Declare a piece of local state inside a functional component.
 
@@ -21,8 +27,8 @@ def use_state(initial):
     Returns
     -------
     (value, setter)
-        value  – the current state value for this render.
-        setter – call with a new value (or an updater function) to
+        value  - the current state value for this render.
+        setter - call with a new value (or an updater function) to
                  trigger a re-render with the updated state.
 
     Example
@@ -45,16 +51,16 @@ def use_state(initial):
         value = initial() if callable(initial) else initial
         fiber.hooks.append(value)
 
-    def set_state(new_value):
+    def set_state(new_value: T | Callable[[T], T]) -> None:
         """
         Update state and schedule a re-render.
 
         Accepts either:
-          set_state(42)            – replace with new value
-          set_state(lambda v: v+1) – derive from previous value
+          set_state(42)            - replace with new value
+          set_state(lambda v: v+1) - derive from previous value
         """
-        current = fiber.hooks[idx]
-        next_value = new_value(current) if callable(new_value) else new_value
+        current: T = fiber.hooks[idx]
+        next_value: T = new_value(current) if callable(new_value) else new_value
         if next_value is not current:   # skip if identical object
             fiber.hooks[idx] = next_value
             schedule_rerender()

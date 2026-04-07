@@ -18,18 +18,28 @@ Notes:
     - React-style aliases also work: className, htmlFor
 """
 
+from __future__ import annotations
+
+from typing import Any, Callable
+
 
 class VNode:
     """Represents a virtual DOM node (element or component placeholder)."""
     __slots__ = ('type', 'props', 'children', 'key')
 
-    def __init__(self, type, props, children, key=None):
-        self.type = type        # str tag or callable component fn
-        self.props = props      # dict of attributes/event handlers
-        self.children = children
-        self.key = key
+    def __init__(
+        self,
+        type: str | Callable[..., Any],
+        props: dict[str, Any],
+        children: list[Any],
+        key: str | int | None = None,
+    ) -> None:
+        self.type: str | Callable[..., Any] = type        # str tag or callable component fn
+        self.props: dict[str, Any] = props      # dict of attributes/event handlers
+        self.children: list[Any] = children
+        self.key: str | int | None = key
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         t = self.type if isinstance(self.type, str) else getattr(self.type, '__name__', repr(self.type))
         return f'VNode<{t}>'
 
@@ -38,20 +48,21 @@ class FragmentNode:
     """Groups children without a wrapper DOM element."""
     __slots__ = ('children', 'key')
 
-    def __init__(self, children, key=None):
-        self.children = children
-        self.key = key
+    def __init__(self, children: list[Any], key: str | int | None = None) -> None:
+        self.children: list[Any] = children
+        self.key: str | int | None = key
 
 
-def fragment(*children, key=None):
+def fragment(*children: Any, key: str | int | None = None) -> FragmentNode:
     """Render multiple children without a wrapping element."""
     return FragmentNode(_flatten(children), key)
 
 
 # ─── Internal helpers ──────────────────────────────────────────────────────────
 
-def _flatten(children):
-    flat = []
+def _flatten(children: tuple[Any, ...]) -> list[Any]:
+    """Flatten nested lists/tuples and filter out None/False."""
+    flat: list[Any] = []
     for child in children:
         if isinstance(child, (list, tuple)):
             flat.extend(_flatten(child))
@@ -60,9 +71,9 @@ def _flatten(children):
     return flat
 
 
-def _el(tag):
+def _el(tag: str) -> Callable[..., VNode]:
     """Return a VNode builder function for *tag*."""
-    def builder(*children, **props):
+    def builder(*children: Any, **props: Any) -> VNode:
         key = props.pop('key', None)
         return VNode(tag, props, _flatten(children), key)
     builder.__name__ = tag

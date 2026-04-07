@@ -7,21 +7,27 @@ per event if several setters fire), we post a single setTimeout(0) and
 flush everything in one shot on the next microtask.
 """
 
+from __future__ import annotations
+
+from typing import Any
+
 from js import setTimeout
 from pyodide.ffi import create_proxy
 
-_pending = False
-_flush_proxy = None   # lazily created to avoid issues at import time
+_pending: bool = False
+_flush_proxy: Any | None = None   # lazily created to avoid issues at import time
 
 
-def _get_proxy():
+def _get_proxy() -> Any:
+    """Get or create the proxy for the flush function."""
     global _flush_proxy
     if _flush_proxy is None:
         _flush_proxy = create_proxy(_flush)
     return _flush_proxy
 
 
-def _flush(*_args):
+def _flush(*_args: Any) -> None:
+    """Flush pending renders."""
     global _pending
     _pending = False
     # Import here to avoid circular import at module level
@@ -29,7 +35,7 @@ def _flush(*_args):
     _root_rerender()
 
 
-def schedule_rerender():
+def schedule_rerender() -> None:
     """Request a root re-render on the next event-loop tick."""
     global _pending
     if not _pending:
