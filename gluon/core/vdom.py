@@ -60,7 +60,7 @@ def fragment(*children: Any, key: str | int | None = None) -> FragmentNode:
 
 # ─── Internal helpers ──────────────────────────────────────────────────────────
 
-def _flatten(children: tuple[Any, ...]) -> list[Any]:
+def _flatten(children: tuple[Any, ...] | list[Any]) -> list[Any]:
     """Flatten nested lists/tuples and filter out None/False."""
     flat: list[Any] = []
     for child in children:
