@@ -19,3 +19,4 @@ packages = []
 "gluon/core/hooks.py"        = "./gluon/core/hooks.py"
 "gluon/core/component.py"    = "./gluon/core/component.py"
 "gluon/core/renderer.py"     = "./gluon/core/renderer.py"
+"gluon/http.py"              = "./gluon/http.py"
