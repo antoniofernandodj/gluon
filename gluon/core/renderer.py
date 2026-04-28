@@ -29,8 +29,7 @@ from __future__ import annotations
 import inspect
 from typing import Any, Callable, cast
 
-from js import document
-from pyodide.ffi import create_proxy
+from gluon.runtime import document, create_proxy
 
 import gluon.core.fiber as _ctx
 from gluon.core.fiber import Fiber

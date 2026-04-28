@@ -10,9 +10,8 @@ flush everything in one shot on the next microtask.
 from __future__ import annotations
 
 from typing import Any
+from gluon.runtime import setTimeout, create_proxy
 
-from js import setTimeout
-from pyodide.ffi import create_proxy
 
 _pending: bool = False
 _flush_proxy: Any | None = None   # lazily created to avoid issues at import time

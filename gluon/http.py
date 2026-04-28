@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 
-from js import fetch as _js_fetch
+from gluon.runtime import fetch as _js_fetch, to_js
 
 
 # ─── Public types ──────────────────────────────────────────────────────────────
@@ -93,7 +93,6 @@ def _build_init(
     if body is not None:
         if isinstance(body, bytes):
             # Pyodide can pass bytes directly to JS via a TypedArray
-            from pyodide.ffi import to_js
             init["body"] = to_js(body)
         else:
             init["body"] = body
