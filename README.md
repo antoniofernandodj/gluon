@@ -1,4 +1,4 @@
-# Gluon
+# ![Gluon](icon.png)
 
 A React-inspired Python UI framework that runs in the browser via WebAssembly (PyScript/Pyodide) and supports **Hybrid Rendering** (SSR + Hydration).
 
